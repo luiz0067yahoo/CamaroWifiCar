@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Controle do Carrinho</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .controle-container {
+            display: grid;
+            grid-template-columns: repeat(3, 150px);
+            grid-template-rows: repeat(3, 150px);
+            gap: 10px;
+            align-items: center;
+            justify-items: center;
+        }
+        .botao {
+            width: 100px;
+            height: 100px;
+            font-size: 30px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .botao:hover {
+            background-color: #45a049;
+        }
+        .botao-stop {
+            background-color: red;
+            font-size: 24px;
+            border-radius: 50%;
+        }
+        .botao-stop:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+
+<div class="controle-container">
+    <!-- Célula vazia no canto superior esquerdo -->
+    <div></div>
+    
+    <!-- Botão de Direção para Cima -->
+    <form action="/comando" method="post">
+        <button class="botao" type="submit" name="acao" value="frente">▲</button>
+    </form>
+
+    <!-- Célula vazia no canto superior direito -->
+    <div></div>
+    
+    <!-- Botão de Direção para Esquerda -->
+    <form action="/comando" method="post">
+        <button class="botao" type="submit" name="acao" value="esquerda">◀</button>
+    </form>
+
+    <!-- Botão Stop no Centro -->
+    <form action="/comando" method="post">
+        <button class="botao botao-stop" type="submit" name="acao" value="parar">STOP</button>
+    </form>
+
+    <!-- Botão de Direção para Direita -->
+    <form action="/comando" method="post">
+        <button class="botao" type="submit" name="acao" value="direita">▶</button>
+    </form>
+
+    <!-- Célula vazia no canto inferior esquerdo -->
+    <div></div>
+    
+    <!-- Botão de Direção para Baixo -->
+    <form action="/comando" method="post">
+        <button class="botao" type="submit" name="acao" value="tras">▼</button>
+    </form>
+
+    <!-- Célula vazia no canto inferior direito -->
+    <div></div>
+</div>
+
+</body>
+</html>
