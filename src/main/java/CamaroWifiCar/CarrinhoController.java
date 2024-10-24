@@ -28,7 +28,7 @@ public class CarrinhoController {
         System.out.println("Comando recebido: " + acao);
 
         // Enviar o comando para o ESP32
-        String esp32Url = "http://192.168.137.202/api/comando"; // Substitua pelo IP do seu ESP32
+        String esp32Url = "http://192.168.137.250/api/comando"; // Substitua pelo IP do seu ESP32
         String jsonDados = "{\"acao\":\"" + acao + "\"}";
 
         ResponseEntity<String> response = restTemplate.postForEntity(esp32Url, jsonDados, String.class);
