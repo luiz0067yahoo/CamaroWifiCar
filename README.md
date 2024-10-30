@@ -22,18 +22,27 @@ Este projeto utiliza um microcontrolador ESP32 para criar um carrinho controlado
 
 ### Hardware
 
-- ESP32
-- 4 relés T73-S-105D
-- 4 transistores C32725
-- 4 resistores de 1k ohm
-- 1 carrinho de brinquedo
-- 2 motores 5V DC
+- **ESP32**
+- **Relés T73-S-105D** (4 unidades): Controlam a ativação dos motores do carrinho.
+- **Transistores C32725** (4 unidades): Conectados aos pinos de controle do ESP32, eles permitem acionar os relés com mais potência.
+- **Resistores de 1k ohm** (4 unidades): Limitam a corrente para a base de cada transistor.
+- **Carrinho de brinquedo**
+- **Motores 5V DC** (2 unidades)
+
+#### Conexões
+
+- **Pino D18 (Frente)**: Conectado a um relé que ativa o motor para mover o carrinho para a frente.
+- **Pino D19 (Ré)**: Conectado a um relé que ativa o motor para mover o carrinho para trás.
+- **Pino D22 (Esquerda)**: Conectado a um relé que ativa o motor para virar o carrinho para a esquerda.
+- **Pino D23 (Direita)**: Conectado a um relé que ativa o motor para virar o carrinho para a direita.
+
+Cada pino de controle do ESP32 é conectado à base de um transistor, que, por sua vez, controla o relé correspondente. Assim, quando um comando é enviado, o relé ativo é acionado e os demais são desativados (nível LOW), permitindo que apenas uma ação aconteça por vez.
 
 ### Software
 
-- Arduino IDE ou PlatformIO para compilar e carregar o código no ESP32.
-- Biblioteca `ArduinoJson` (ArduinoJson v6 ou superior).
-- Biblioteca `WebServer`, incluída na instalação padrão do ESP32.
+- **Arduino IDE** ou **PlatformIO** para compilar e carregar o código no ESP32.
+- **Biblioteca ArduinoJson** (v6 ou superior) para processamento de comandos em JSON.
+- **Biblioteca WebServer** para criar o servidor HTTP, incluída na instalação padrão do ESP32.
 
 ## Como Usar
 
@@ -63,6 +72,7 @@ Este projeto utiliza um microcontrolador ESP32 para criar um carrinho controlado
 - **Setup**: Configurações iniciais, incluindo a configuração do ponto de acesso e a definição das rotas HTTP.
 - **Loop**: Escuta e processa as requisições do cliente, executando cada ação por 1 segundo e depois colocando todos os pinos em nível LOW para garantir apenas uma ação ativa de cada vez.
 
+## Contribuições
 
-
+Contribuições são bem-vindas! Sinta-se à vontade para discutir melhorias.
 
