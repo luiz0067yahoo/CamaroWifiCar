@@ -5,6 +5,7 @@ Este projeto utiliza um microcontrolador ESP32 para criar um carrinho controlado
 ## Funcionalidades
 
 - **Hotspot**: O ESP32 cria um ponto de acesso Wi-Fi com o SSID `"Carrinho_WiFi"` e a senha `"00000000"`.
+- **IP**: htp://192.168.1.1
 - **Controle via Web**: Uma interface web permite controlar o carrinho através de botões de direção.
 - **Comandos**: Os comandos disponíveis incluem:
   - Avançar
