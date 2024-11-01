@@ -8,11 +8,11 @@ Este projeto utiliza um microcontrolador ESP32 para criar um carrinho controlado
 - **IP**: htp://192.168.1.1
 - **Controle via Web**: Uma interface web permite controlar o carrinho através de botões de direção.
 - **Comandos**: Os comandos disponíveis incluem:
-  - Avançar
-  - Recuar
-  - Virar à esquerda
-  - Virar à direita
-  - Parar (coloca todos os pinos em nível LOW)
+  - Avançar (LOW)
+  - Recuar (LOW)
+  - Virar à esquerda (LOW)
+  - Virar à direita (LOW)
+  - Parar (coloca todos os pinos em nível UP)
 
 ## Estrutura do Projeto
 
