@@ -191,6 +191,11 @@ void handleComando() {
     printPinStates();
 }
 
+void handleNotFound() {
+    server.sendHeader("Location", "http://192.168.1.1");
+    server.send(302, "text/plain", "Redirecionando...");
+}
+
 void setup() {
     Serial.begin(115200);
 
@@ -214,7 +219,8 @@ void setup() {
     digitalWrite(PIN_DIREITA, HIGH);
 
     server.on("/", HTTP_GET, handleRoot);
-    server.on("/api/comando", HTTP_POST, handleComando);  
+    server.on("/api/comando", HTTP_POST, handleComando);
+    server.onNotFound(handleNotFound);  // Para qualquer rota não encontrada
 
     server.begin();
 }
