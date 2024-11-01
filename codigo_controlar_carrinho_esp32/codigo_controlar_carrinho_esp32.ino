@@ -1,6 +1,5 @@
 #include <WiFi.h>
 #include <WebServer.h>
-#include <ArduinoJson.h>
 
 const char* ssid = "Carrinho_WiFi";  // Nome do Hotspot
 const char* password = "00000000";  // Senha do Hotspot
@@ -15,6 +14,10 @@ const int PIN_FRENTE = 18;   // Frente
 const int PIN_TRAS = 19;     // Trás
 const int PIN_ESQUERDA = 22; // Esquerda
 const int PIN_DIREITA = 23;  // Direita
+
+// Variáveis de controle de movimento
+bool movimentoFrente = false;
+bool movimentoTras = false;
 
 // HTML da página de controle embutida
 const char controlPage[] PROGMEM = R"rawliteral(
@@ -35,28 +38,55 @@ const char controlPage[] PROGMEM = R"rawliteral(
 
 <div class="controle-container">
     <div></div>
-    <button class="botao" onclick="enviarComando('frente')">▲</button>
+    <button class="botao" id="frente">▲</button>
     <div></div>
     
-    <button class="botao" onclick="enviarComando('esquerda')">◀</button>
-    <button class="botao botao-stop" onclick="enviarComando('parar')">STOP</button>
-    <button class="botao" onclick="enviarComando('direita')">▶</button>
+    <button class="botao" id="esquerda">◀</button>
+    <button class="botao botao-stop" id="parar">STOP</button>
+    <button class="botao" id="direita">▶</button>
     
     <div></div>
-    <button class="botao" onclick="enviarComando('tras')">▼</button>
+    <button class="botao" id="tras">▼</button>
     <div></div>
 </div>
 
 <script>
+    let movimentoFrente = false;
+    let movimentoTras = false;
+
+    document.getElementById('frente').onmousedown = () => {
+        movimentoFrente = true;
+        enviarComando('frente');
+    };
+
+    document.getElementById('frente').onmouseup = () => {
+        movimentoFrente = false;
+        enviarComando('parar');
+    };
+
+    document.getElementById('tras').onmousedown = () => {
+        movimentoTras = true;
+        enviarComando('tras');
+    };
+
+    document.getElementById('tras').onmouseup = () => {
+        movimentoTras = false;
+        enviarComando('parar');
+    };
+
+    document.getElementById('esquerda').onclick = () => enviarComando('esquerda');
+    document.getElementById('direita').onclick = () => enviarComando('direita');
+    document.getElementById('parar').onclick = () => enviarComando('parar');
+
     function enviarComando(acao) {
         fetch("/api/comando", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/x-www-form-urlencoded"
             },
-            body: JSON.stringify({ acao: acao })
+            body: "acao=" + acao
         })
-        .then(response => response.json())
+        .then(response => response.text())
         .then(data => {
             console.log("Comando enviado: " + acao);
         })
@@ -81,16 +111,7 @@ void handleRoot() {
 
 void handleComando() {
     String body = server.arg("plain");
-
-    StaticJsonDocument<200> doc;
-    DeserializationError error = deserializeJson(doc, body);
-
-    if (error) {
-        server.send(400, "application/json", "{\"status\":\"erro\", \"mensagem\":\"JSON inválido\"}");
-        return;
-    }
-
-    String acao = doc["acao"];
+    String acao = body.substring(body.indexOf('=') + 1); // Extrai a ação da string
 
     // Ativa todos os pinos
     digitalWrite(PIN_FRENTE, HIGH);
@@ -101,41 +122,33 @@ void handleComando() {
     printPinStates();
 
     if (acao == "frente") {
-        digitalWrite(PIN_FRENTE, LOW);
+        movimentoFrente = true;
         Serial.println("Comando: Movendo para frente");
-        printPinStates();
-        delay(1000);  
-        digitalWrite(PIN_FRENTE, HIGH);  
-        server.send(200, "application/json", "{\"status\":\"Movendo para frente\"}");
     } else if (acao == "tras") {
-        digitalWrite(PIN_TRAS, LOW);
+        movimentoTras = true;
         Serial.println("Comando: Movendo para trás");
-        printPinStates();
-        delay(1000);  
-        digitalWrite(PIN_TRAS, HIGH);  
-        server.send(200, "application/json", "{\"status\":\"Movendo para trás\"}");
     } else if (acao == "esquerda") {
         digitalWrite(PIN_ESQUERDA, LOW);
         Serial.println("Comando: Virando à esquerda");
-        printPinStates();
-        delay(500);  
-        digitalWrite(PIN_ESQUERDA, HIGH);  
-        server.send(200, "application/json", "{\"status\":\"Virando à esquerda\"}");
+        delay(500); // Gira por 0,5 segundos
+        digitalWrite(PIN_ESQUERDA, HIGH);
     } else if (acao == "direita") {
         digitalWrite(PIN_DIREITA, LOW);
         Serial.println("Comando: Virando à direita");
-        printPinStates();
-        delay(500);  
-        digitalWrite(PIN_DIREITA, HIGH);  
-        server.send(200, "application/json", "{\"status\":\"Virando à direita\"}");
+        delay(500); // Gira por 0,5 segundos
+        digitalWrite(PIN_DIREITA, HIGH);
     } else if (acao == "parar") {
+        movimentoFrente = false;
+        movimentoTras = false;
         Serial.println("Comando: Parado");
-        printPinStates();
-        server.send(200, "application/json", "{\"status\":\"Parado\"}");
+        digitalWrite(PIN_FRENTE, HIGH);
+        digitalWrite(PIN_TRAS, HIGH);
     } else {
-        server.send(400, "application/json", "{\"status\":\"erro\", \"mensagem\":\"Comando desconhecido\"}");
+        server.send(400, "text/plain", "Comando desconhecido");
+        return;
     }
 
+    server.send(200, "text/plain", "Comando recebido");
     // Exibe o estado final dos pinos após o comando
     Serial.println("Estado dos pinos após o comando:");
     printPinStates();
@@ -158,7 +171,12 @@ void setup() {
     pinMode(PIN_ESQUERDA, OUTPUT);
     pinMode(PIN_DIREITA, OUTPUT);
 
-    server.on("/", HTTP_GET, handleRoot);  
+    digitalWrite(PIN_FRENTE, HIGH);
+    digitalWrite(PIN_TRAS, HIGH);
+    digitalWrite(PIN_ESQUERDA, HIGH);
+    digitalWrite(PIN_DIREITA, HIGH);
+
+    server.on("/", HTTP_GET, handleRoot);
     server.on("/api/comando", HTTP_POST, handleComando);  
 
     server.begin();
@@ -166,4 +184,17 @@ void setup() {
 
 void loop() {
     server.handleClient();
+
+    // Executa a lógica de movimento com base nas variáveis
+    if (movimentoFrente) {
+        digitalWrite(PIN_FRENTE, LOW); // Ativa o movimento para frente
+    } else {
+        digitalWrite(PIN_FRENTE, HIGH); // Para o movimento para frente
+    }
+
+    if (movimentoTras) {
+        digitalWrite(PIN_TRAS, LOW); // Ativa o movimento para trás
+    } else {
+        digitalWrite(PIN_TRAS, HIGH); // Para o movimento para trás
+    }
 }
