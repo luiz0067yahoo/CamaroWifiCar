@@ -1,25 +1,28 @@
 #include <WiFi.h>
 #include <WebServer.h>
+#include <ArduinoJson.h>
 
-const char* ssid = "Carrinho_WiFi";  // Nome do Hotspot
-const char* password = "00000000";  // Senha do Hotspot
+const char* ssid = "MeuHotspot";
+const char* password = "00000000";
 
-// Configurações do IP estático
-IPAddress local_IP(192, 168, 1, 1);  // IP estático desejado para o hotspot
-IPAddress gateway(192, 168, 1, 1);   // Gateway
-IPAddress subnet(255, 255, 255, 0);  // Máscara de sub-rede
+IPAddress local_IP(192, 168, 1, 1);
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
 
 WebServer server(80);
-const int PIN_FRENTE = 18;   // Frente
-const int PIN_TRAS = 19;     // Trás
-const int PIN_ESQUERDA = 22; // Esquerda
-const int PIN_DIREITA = 23;  // Direita
 
-// Variáveis de controle de movimento
-bool movimentoFrente = false;
-bool movimentoTras = false;
+const int PIN_FRENTE = 18;
+const int PIN_TRAS = 19;
+const int PIN_DIREITA = 22;
+const int PIN_ESQUERDA = 23;
 
-// HTML da página de controle embutida
+unsigned long pressStartTime = 0;
+unsigned long pressDuration = 0;
+unsigned long activeStartTime = 0;
+unsigned long activeDuration = 0;
+bool isPressing = false;
+bool isActive = false;
+
 const char controlPage[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="en">
@@ -28,10 +31,10 @@ const char controlPage[] PROGMEM = R"rawliteral(
     <title>Controle do Carrinho</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; background-color: #f3f3f3; }
-        .controle-container { display: inline-grid; grid-template-columns: 100px 100px 100px; gap: 10px; }
-        .botao { font-size: 24px; padding: 20px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .controle-container { display: inline-grid; grid-template-columns: 200px 200px 200px; gap: 10px; }
+        .botao { font-size: 24px; width: 200px; height: 200px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
         .botao-stop { background-color: #f44336; }
-        .botao:active { background-color: #3e8e41; }
+        .botao:active { background-color: black; }
     </style>
 </head>
 <body>
@@ -51,40 +54,44 @@ const char controlPage[] PROGMEM = R"rawliteral(
 </div>
 
 <script>
-    let movimentoFrente = false;
-    let movimentoTras = false;
+    let intervalos = {};
 
-    document.getElementById('frente').onmousedown = () => {
-        movimentoFrente = true;
-        enviarComando('frente');
-    };
+    function iniciarIntervalo(acao) {
+        if (!intervalos[acao]) {
+            enviarComando(acao);
+            intervalos[acao] = setInterval(() => enviarComando(acao), 200);
+        }
+    }
 
-    document.getElementById('frente').onmouseup = () => {
-        movimentoFrente = false;
-        enviarComando('parar');
-    };
+    function pararIntervalo(acao) {
+        if (intervalos[acao]) {
+            clearInterval(intervalos[acao]);
+            enviarComando(acao + "_parar");
+            delete intervalos[acao];
+        }
+    }
 
-    document.getElementById('tras').onmousedown = () => {
-        movimentoTras = true;
-        enviarComando('tras');
-    };
+    document.getElementById('frente').ontouchstart = document.getElementById('frente').onmousedown = () => iniciarIntervalo('frente');
+    document.getElementById('frente').ontouchend = document.getElementById('frente').onmouseup = document.getElementById('frente').onmouseleave = () => pararIntervalo('frente');
 
-    document.getElementById('tras').onmouseup = () => {
-        movimentoTras = false;
-        enviarComando('parar');
-    };
+    document.getElementById('tras').ontouchstart = document.getElementById('tras').onmousedown = () => iniciarIntervalo('tras');
+    document.getElementById('tras').ontouchend = document.getElementById('tras').onmouseup = document.getElementById('tras').onmouseleave = () => pararIntervalo('tras');
 
-    document.getElementById('esquerda').onclick = () => enviarComando('esquerda');
-    document.getElementById('direita').onclick = () => enviarComando('direita');
+    document.getElementById('esquerda').ontouchstart = document.getElementById('esquerda').onmousedown = () => iniciarIntervalo('esquerda');
+    document.getElementById('esquerda').ontouchend = document.getElementById('esquerda').onmouseup = document.getElementById('esquerda').onmouseleave = () => pararIntervalo('esquerda');
+
+    document.getElementById('direita').ontouchstart = document.getElementById('direita').onmousedown = () => iniciarIntervalo('direita');
+    document.getElementById('direita').ontouchend = document.getElementById('direita').onmouseup = document.getElementById('direita').onmouseleave = () => pararIntervalo('direita');
+
     document.getElementById('parar').onclick = () => enviarComando('parar');
 
     function enviarComando(acao) {
         fetch("/api/comando", {
             method: "POST",
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
+                "Content-Type": "application/json"
             },
-            body: "acao=" + acao
+            body: JSON.stringify({ acao: acao })
         })
         .then(response => response.text())
         .then(data => {
@@ -98,103 +105,112 @@ const char controlPage[] PROGMEM = R"rawliteral(
 </html>
 )rawliteral";
 
-void printPinStates() {
-    Serial.print("Estado do PIN_FRENTE: "); Serial.println(digitalRead(PIN_FRENTE) ? "LOW" : "HIGH");
-    Serial.print("Estado do PIN_TRAS: "); Serial.println(digitalRead(PIN_TRAS) ? "LOW" : "HIGH");
-    Serial.print("Estado do PIN_ESQUERDA: "); Serial.println(digitalRead(PIN_ESQUERDA) ? "LOW" : "HIGH");
-    Serial.print("Estado do PIN_DIREITA: "); Serial.println(digitalRead(PIN_DIREITA) ? "LOW" : "HIGH");
-}
-
 void handleRoot() {
-    server.send(200, "text/html", controlPage);  // Serve a página de controle
+  server.send(200, "text/html", controlPage);
 }
 
 void handleComando() {
-    String body = server.arg("plain");
-    String acao = body.substring(body.indexOf('=') + 1); // Extrai a ação da string
+  String body = server.arg("plain");
 
-    // Ativa todos os pinos
+  StaticJsonDocument<200> doc;
+  DeserializationError error = deserializeJson(doc, body);
+
+  if (error) {
+    server.send(400, "application/json", "{\"status\":\"erro\", \"mensagem\":\"JSON inválido\"}");
+    Serial.println("Erro: JSON inválido");
+    return;
+  }
+
+  String acao = doc["acao"];
+  Serial.print("Recebido comando: ");
+  Serial.println(acao);
+
+  if (acao.endsWith("_parar")) {
     digitalWrite(PIN_FRENTE, HIGH);
     digitalWrite(PIN_TRAS, HIGH);
     digitalWrite(PIN_ESQUERDA, HIGH);
     digitalWrite(PIN_DIREITA, HIGH);
-    Serial.println("Todos os pinos ativados:");
-    printPinStates();
 
-    if (acao == "frente") {
-        movimentoFrente = true;
-        Serial.println("Comando: Movendo para frente");
-    } else if (acao == "tras") {
-        movimentoTras = true;
-        Serial.println("Comando: Movendo para trás");
-    } else if (acao == "esquerda") {
-        digitalWrite(PIN_ESQUERDA, LOW);
-        Serial.println("Comando: Virando à esquerda");
-        delay(500); // Gira por 0,5 segundos
-        digitalWrite(PIN_ESQUERDA, HIGH);
-    } else if (acao == "direita") {
-        digitalWrite(PIN_DIREITA, LOW);
-        Serial.println("Comando: Virando à direita");
-        delay(500); // Gira por 0,5 segundos
-        digitalWrite(PIN_DIREITA, HIGH);
-    } else if (acao == "parar") {
-        movimentoFrente = false;
-        movimentoTras = false;
-        Serial.println("Comando: Parado");
-        digitalWrite(PIN_FRENTE, HIGH);
-        digitalWrite(PIN_TRAS, HIGH);
-    } else {
-        server.send(400, "text/plain", "Comando desconhecido");
-        return;
+    activeDuration = (millis() - activeStartTime) / 1000;
+    if (activeDuration > 0) { 
+      Serial.print("Tempo ligado: ");
+      Serial.print(activeDuration);
+      Serial.println(" segundos");
+    }
+    isActive = false;
+  } else {
+    if (!isActive) {
+      activeStartTime = millis();
+      isActive = true;
     }
 
-    server.send(200, "text/plain", "Comando recebido");
-    // Exibe o estado final dos pinos após o comando
-    Serial.println("Estado dos pinos após o comando:");
-    printPinStates();
+    if (acao == "frente") {
+      digitalWrite(PIN_FRENTE, LOW);
+      digitalWrite(PIN_TRAS, HIGH);
+      digitalWrite(PIN_ESQUERDA, HIGH);
+      digitalWrite(PIN_DIREITA, HIGH);
+    } else if (acao == "tras") {
+      digitalWrite(PIN_FRENTE, HIGH);
+      digitalWrite(PIN_TRAS, LOW);
+      digitalWrite(PIN_ESQUERDA, HIGH);
+      digitalWrite(PIN_DIREITA, HIGH);
+    } else if (acao == "esquerda") {
+      digitalWrite(PIN_FRENTE, HIGH);
+      digitalWrite(PIN_TRAS, HIGH);
+      digitalWrite(PIN_ESQUERDA, LOW);
+      digitalWrite(PIN_DIREITA, HIGH);
+    } else if (acao == "direita") {
+      digitalWrite(PIN_FRENTE, HIGH);
+      digitalWrite(PIN_TRAS, HIGH);
+      digitalWrite(PIN_ESQUERDA, HIGH);
+      digitalWrite(PIN_DIREITA, LOW);
+    }
+  }
+
+  if (acao == "parar") {
+    digitalWrite(PIN_FRENTE, HIGH);
+    digitalWrite(PIN_TRAS, HIGH);
+    digitalWrite(PIN_ESQUERDA, HIGH);
+    digitalWrite(PIN_DIREITA, HIGH);
+
+    if (isPressing) {
+      pressDuration = (millis() - pressStartTime) / 1000;
+      if (pressDuration > 0) {
+        Serial.print("Tempo pressionado: ");
+        Serial.print(pressDuration);
+        Serial.println(" segundos");
+      }
+      isPressing = false;
+    }
+  }
 }
 
 void setup() {
-    Serial.begin(115200);
+  Serial.begin(115200);
+  WiFi.softAP(ssid, password);
+  WiFi.softAPConfig(local_IP, gateway, subnet);
 
-    // Inicializa o modo de ponto de acesso
-    WiFi.softAP(ssid, password);
-    WiFi.softAPConfig(local_IP, gateway, subnet);
+  Serial.println("Hotspot criado!");
+  Serial.print("IP do Hotspot: ");
+  Serial.println(WiFi.softAPIP());
 
-    Serial.println("Hotspot criado!");
-    Serial.print("IP do Hotspot: ");
-    Serial.println(WiFi.softAPIP());
+  pinMode(PIN_FRENTE, OUTPUT);
+  pinMode(PIN_TRAS, OUTPUT);
+  pinMode(PIN_DIREITA, OUTPUT);
+  pinMode(PIN_ESQUERDA, OUTPUT);
 
-    // Configura os pinos de controle como saída
-    pinMode(PIN_FRENTE, OUTPUT);
-    pinMode(PIN_TRAS, OUTPUT);
-    pinMode(PIN_ESQUERDA, OUTPUT);
-    pinMode(PIN_DIREITA, OUTPUT);
+  digitalWrite(PIN_FRENTE, HIGH);
+  digitalWrite(PIN_TRAS, HIGH);
+  digitalWrite(PIN_DIREITA, HIGH);
+  digitalWrite(PIN_ESQUERDA, HIGH);
 
-    digitalWrite(PIN_FRENTE, HIGH);
-    digitalWrite(PIN_TRAS, HIGH);
-    digitalWrite(PIN_ESQUERDA, HIGH);
-    digitalWrite(PIN_DIREITA, HIGH);
+  server.on("/", HTTP_GET, handleRoot);
+  server.on("/api/comando", HTTP_POST, handleComando);
 
-    server.on("/", HTTP_GET, handleRoot);
-    server.on("/api/comando", HTTP_POST, handleComando);  
-
-    server.begin();
+  server.begin();
+  Serial.println("Servidor iniciado.");
 }
 
 void loop() {
-    server.handleClient();
-
-    // Executa a lógica de movimento com base nas variáveis
-    if (movimentoFrente) {
-        digitalWrite(PIN_FRENTE, LOW); // Ativa o movimento para frente
-    } else {
-        digitalWrite(PIN_FRENTE, HIGH); // Para o movimento para frente
-    }
-
-    if (movimentoTras) {
-        digitalWrite(PIN_TRAS, LOW); // Ativa o movimento para trás
-    } else {
-        digitalWrite(PIN_TRAS, HIGH); // Para o movimento para trás
-    }
+  server.handleClient();
 }
