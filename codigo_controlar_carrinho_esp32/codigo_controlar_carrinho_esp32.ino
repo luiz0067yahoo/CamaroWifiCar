@@ -51,31 +51,68 @@ const char controlPage[] PROGMEM = R"rawliteral(
 </div>
 
 <script>
-    let movimentoFrente = false;
-    let movimentoTras = false;
+    let intervaloFrente, intervaloTras, intervaloEsquerda, intervaloDireita;
 
     document.getElementById('frente').onmousedown = () => {
-        movimentoFrente = true;
         enviarComando('frente');
+        intervaloFrente = setInterval(() => {
+            enviarComando('frente');
+        }, 200);
     };
 
     document.getElementById('frente').onmouseup = () => {
-        movimentoFrente = false;
-        enviarComando('parar');
+        clearInterval(intervaloFrente);
+    };
+
+    document.getElementById('frente').onmouseleave = () => {
+        clearInterval(intervaloFrente);
     };
 
     document.getElementById('tras').onmousedown = () => {
-        movimentoTras = true;
         enviarComando('tras');
+        intervaloTras = setInterval(() => {
+            enviarComando('tras');
+        }, 200);
     };
 
     document.getElementById('tras').onmouseup = () => {
-        movimentoTras = false;
-        enviarComando('parar');
+        clearInterval(intervaloTras);
     };
 
-    document.getElementById('esquerda').onclick = () => enviarComando('esquerda');
-    document.getElementById('direita').onclick = () => enviarComando('direita');
+    document.getElementById('tras').onmouseleave = () => {
+        clearInterval(intervaloTras);
+    };
+
+    document.getElementById('esquerda').onmousedown = () => {
+        enviarComando('esquerda');
+        intervaloEsquerda = setInterval(() => {
+            enviarComando('esquerda');
+        }, 200);
+    };
+
+    document.getElementById('esquerda').onmouseup = () => {
+        clearInterval(intervaloEsquerda);
+    };
+
+    document.getElementById('esquerda').onmouseleave = () => {
+        clearInterval(intervaloEsquerda);
+    };
+
+    document.getElementById('direita').onmousedown = () => {
+        enviarComando('direita');
+        intervaloDireita = setInterval(() => {
+            enviarComando('direita');
+        }, 200);
+    };
+
+    document.getElementById('direita').onmouseup = () => {
+        clearInterval(intervaloDireita);
+    };
+
+    document.getElementById('direita').onmouseleave = () => {
+        clearInterval(intervaloDireita);
+    };
+
     document.getElementById('parar').onclick = () => enviarComando('parar');
 
     function enviarComando(acao) {
