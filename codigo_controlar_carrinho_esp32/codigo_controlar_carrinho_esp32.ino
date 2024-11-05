@@ -30,6 +30,9 @@ const char controlPage[] PROGMEM = R"rawliteral(
     <meta charset="UTF-8">
     <title>Controle do Carrinho</title>
     <style>
+        * {
+            user-select: none;
+        }
         body { font-family: Arial, sans-serif; text-align: center; background-color: #f3f3f3; }
         .controle-container { display: inline-grid; grid-template-columns: 200px 200px 200px; gap: 10px; }
         .botao { font-size: 24px; width: 200px; height: 200px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
