@@ -2,7 +2,7 @@
 #include <WebServer.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "MeuHotspot";
+const char* ssid = "Carrinho_WiFi";
 const char* password = "00000000";
 
 IPAddress local_IP(192, 168, 1, 1);
