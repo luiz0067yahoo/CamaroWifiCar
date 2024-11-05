@@ -25,7 +25,7 @@ Este projeto utiliza um microcontrolador ESP32 para criar um carrinho controlado
 
 - **ESP32**
 - **Relés T73-S-105D** (4 unidades): Controlam a ativação dos motores do carrinho.
-- **Transistores C32725** (4 unidades): Conectados aos pinos de controle do ESP32, eles permitem acionar os relés com mais potência.
+- **Transistores BC32725** (4 unidades): Conectados aos pinos de controle do ESP32, eles permitem acionar os relés com mais potência.
 - **Resistores de 1k ohm** (4 unidades): Limitam a corrente para a base de cada transistor.
 - **Carrinho de brinquedo**
 - **Motores 5V DC** (2 unidades)
