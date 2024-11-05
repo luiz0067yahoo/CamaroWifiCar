@@ -29,7 +29,13 @@ Este projeto utiliza um microcontrolador ESP32 para criar um carrinho controlado
 - **Resistores de 1k ohm** (4 unidades): Limitam a corrente para a base de cada transistor.
 - **Carrinho de brinquedo**
 - **Motores 5V DC** (2 unidades)
-
+- **Carregador portatil 12.000 mha** (1 unidades)
+- **Cabo mini usb** (2 unidades)
+- **Cabo flexivel de cobre 0.3 vermelho** (50 cm)
+- **Cabo flexivel de cobre 0.3 preto** (50 cm)
+- **Tubo De Solda Estanho C/ Fluxo Ra (t2)** (63x37 1mm)
+- **Pasta De Solda - Fluxo Em Pasta - Pote** ( 110g)
+- **Ferro De Soldar Hikari Profissional 127v Sc-30** (25W)
 #### Conexões
 
 - **Pino D18 (Frente)**: Conectado a um relé que ativa o motor para mover o carrinho para a frente.
