@@ -34,8 +34,14 @@ Este projeto utiliza um microcontrolador ESP32 para criar um carrinho controlado
 - **Cabo flexivel de cobre 0.3 vermelho** (50 cm)
 - **Cabo flexivel de cobre 0.3 preto** (50 cm)
 - **Tubo De Solda Estanho C/ Fluxo Ra (t2)** (63x37 1mm)
-- **Pasta De Solda - Fluxo Em Pasta - Pote** ( 110g)
+- **Pasta De Solda - Fluxo Em Pasta - Pote** (110g)
 - **Ferro De Soldar Hikari Profissional 127v Sc-30** (25W)
+- **Fonte de alimentação AC 110/220V DC 5V 1A** (1)
+- **Protoboard Breadboard 400 Pontos Furos Pinos** (1)
+- **O LED difuso de 5mm** (4)
+- **Cabos Jumper 20cm Macho X Macho** (10)
+- **Cabos Jumper 20cm Femea X Femea** (10)
+
 #### Conexões
 
 - **Pino D18 (Frente)**: Conectado a um relé que ativa o motor para mover o carrinho para a frente.
