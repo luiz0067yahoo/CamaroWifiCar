@@ -115,30 +115,27 @@ void handleComando() {
     }
 
     String acao = doc["acao"];
-    if (acao.endsWith("_parar")) {
-        digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
-        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
-        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
-        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
-    } else {
-        if (acao == "frente") {
-            digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
-            digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
-            digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
-            digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
-        } else if (acao == "tras") {
-            digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
-            digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
-            digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
-            digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
-        } else if (acao == "esquerda") {
-            digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
-            digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
-        } else if (acao == "direita") {
-            digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
-            digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
-        }
+    digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
+    digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+    digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
+    digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
+
+    if (acao == "frente") {
+        digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
+        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
+    } else if (acao == "tras") {
+        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
+        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
+    } else if (acao == "esquerda_frente") {
+        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
+    } else if (acao == "direita_frente") {
+        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
+    } else if (acao == "esquerda_tras") {
+        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
+    } else if (acao == "direita_tras") {
+        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
     }
+
     server.send(200, "application/json", "{\"status\":\"ok\"}");
 }
 
