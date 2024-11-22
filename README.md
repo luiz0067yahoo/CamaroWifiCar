@@ -1,3 +1,4 @@
+https://www.youtube.com/shorts/ENgTwekbC0k
 # Controle do Carrinho com ESP32
 
 Este projeto utiliza um microcontrolador ESP32 para criar um carrinho controlado via Wi-Fi. O ESP32 funciona como um hotspot, permitindo que dispositivos se conectem a ele e enviem comandos para controlar o carrinho.
