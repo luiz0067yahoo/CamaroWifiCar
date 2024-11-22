@@ -20,7 +20,6 @@ Este projeto utiliza um microcontrolador ESP32 para criar um carrinho controlado
 - **index.html**: Código HTML embutido que fornece a interface de controle.
 
 ## Requisitos
-
 ### Hardware
 
 - **ESP32**
@@ -41,13 +40,17 @@ Este projeto utiliza um microcontrolador ESP32 para criar um carrinho controlado
 - **O LED difuso de 5mm** (4)
 - **Cabos Jumper 20cm Macho X Macho** (10)
 - **Cabos Jumper 20cm Femea X Femea** (10)
-
+- **Pistola de cola quente**
+- **Caixa de papelão**
+- **Fita durex**
+- **Tinta**
 #### Conexões
 
-- **Pino D18 (Frente)**: Conectado a um relé que ativa o motor para mover o carrinho para a frente.
-- **Pino D19 (Ré)**: Conectado a um relé que ativa o motor para mover o carrinho para trás.
-- **Pino D22 (Esquerda)**: Conectado a um relé que ativa o motor para virar o carrinho para a esquerda.
-- **Pino D23 (Direita)**: Conectado a um relé que ativa o motor para virar o carrinho para a direita.
+- **Pino D18 (ré esquerda)**: Conectado a um relé que ativa o motor para mover o carrinho para a frente.
+- **Pino D19 (Frente esquerda)**: Conectado a um relé que ativa o motor para mover o carrinho para trás.
+- 
+- **Pino D22 (Frente direita)**: Conectado a um relé que ativa o motor para virar o carrinho para a esquerda.
+- **Pino D23 (Ré direita)**: Conectado a um relé que ativa o motor para virar o carrinho para a direita.
 
 Cada pino de controle do ESP32 é conectado à base de um transistor, que, por sua vez, controla o relé correspondente. Assim, quando um comando é enviado, o relé ativo é acionado e os demais são desativados (nível LOW), permitindo que apenas uma ação aconteça por vez.
 
