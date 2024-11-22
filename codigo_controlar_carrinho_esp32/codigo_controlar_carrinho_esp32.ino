@@ -2,27 +2,25 @@
 #include <WebServer.h>
 #include <ArduinoJson.h>
 
-const char* ssid = "Carrinho_WiFi";
+// Definições de WiFi
+const char* ssid = "TI_DO_CEU";
 const char* password = "00000000";
 
+// Configuração de IP estático
 IPAddress local_IP(192, 168, 1, 1);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 
+// Configuração do servidor
 WebServer server(80);
 
-const int PIN_FRENTE = 18;
-const int PIN_TRAS = 19;
-const int PIN_DIREITA = 22;
-const int PIN_ESQUERDA = 23;
+// Definição dos pinos
+#define PIN_MOTOR_ESQUERDO_FRENTE 19
+#define PIN_MOTOR_ESQUERDO_TRAZ 18
+#define PIN_MOTOR_DIREITO_FRENTE 22
+#define PIN_MOTOR_DIREITO_TRAZ 23
 
-unsigned long pressStartTime = 0;
-unsigned long pressDuration = 0;
-unsigned long activeStartTime = 0;
-unsigned long activeDuration = 0;
-bool isPressing = false;
-bool isActive = false;
-
+// Página HTML para controle
 const char controlPage[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html lang="en">
@@ -30,9 +28,7 @@ const char controlPage[] PROGMEM = R"rawliteral(
     <meta charset="UTF-8">
     <title>Controle do Carrinho</title>
     <style>
-        * {
-            user-select: none;
-        }
+        * { user-select: none; }
         body { font-family: Arial, sans-serif; text-align: center; background-color: #f3f3f3; }
         .controle-container { display: inline-grid; grid-template-columns: 200px 200px 200px; gap: 10px; }
         .botao { font-size: 24px; width: 200px; height: 200px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; }
@@ -41,7 +37,6 @@ const char controlPage[] PROGMEM = R"rawliteral(
     </style>
 </head>
 <body>
-
 <div class="controle-container">
     <div></div>
     <button class="botao" id="frente">▲</button>
@@ -97,123 +92,77 @@ const char controlPage[] PROGMEM = R"rawliteral(
             body: JSON.stringify({ acao: acao })
         })
         .then(response => response.text())
-        .then(data => {
-            console.log("Comando enviado: " + acao);
-        })
+        .then(data => console.log("Comando enviado: " + acao))
         .catch(error => console.error("Erro ao enviar comando: " + error));
     }
 </script>
-
 </body>
 </html>
 )rawliteral";
 
 void handleRoot() {
-  server.send(200, "text/html", controlPage);
+    server.send(200, "text/html", controlPage);
 }
 
 void handleComando() {
-  String body = server.arg("plain");
+    String body = server.arg("plain");
+    StaticJsonDocument<200> doc;
+    DeserializationError error = deserializeJson(doc, body);
 
-  StaticJsonDocument<200> doc;
-  DeserializationError error = deserializeJson(doc, body);
-
-  if (error) {
-    server.send(400, "application/json", "{\"status\":\"erro\", \"mensagem\":\"JSON inválido\"}");
-    Serial.println("Erro: JSON inválido");
-    return;
-  }
-
-  String acao = doc["acao"];
-  Serial.print("Recebido comando: ");
-  Serial.println(acao);
-
-  if (acao.endsWith("_parar")) {
-    digitalWrite(PIN_FRENTE, HIGH);
-    digitalWrite(PIN_TRAS, HIGH);
-    digitalWrite(PIN_ESQUERDA, HIGH);
-    digitalWrite(PIN_DIREITA, HIGH);
-
-    activeDuration = (millis() - activeStartTime) / 1000;
-    if (activeDuration > 0) { 
-      Serial.print("Tempo ligado: ");
-      Serial.print(activeDuration);
-      Serial.println(" segundos");
-    }
-    isActive = false;
-  } else {
-    if (!isActive) {
-      activeStartTime = millis();
-      isActive = true;
+    if (error) {
+        server.send(400, "application/json", "{\"status\":\"erro\", \"mensagem\":\"JSON inválido\"}");
+        return;
     }
 
-    if (acao == "frente") {
-      digitalWrite(PIN_FRENTE, LOW);
-      digitalWrite(PIN_TRAS, HIGH);
-      digitalWrite(PIN_ESQUERDA, HIGH);
-      digitalWrite(PIN_DIREITA, HIGH);
-    } else if (acao == "tras") {
-      digitalWrite(PIN_FRENTE, HIGH);
-      digitalWrite(PIN_TRAS, LOW);
-      digitalWrite(PIN_ESQUERDA, HIGH);
-      digitalWrite(PIN_DIREITA, HIGH);
-    } else if (acao == "esquerda") {
-      digitalWrite(PIN_FRENTE, HIGH);
-      digitalWrite(PIN_TRAS, HIGH);
-      digitalWrite(PIN_ESQUERDA, LOW);
-      digitalWrite(PIN_DIREITA, HIGH);
-    } else if (acao == "direita") {
-      digitalWrite(PIN_FRENTE, HIGH);
-      digitalWrite(PIN_TRAS, HIGH);
-      digitalWrite(PIN_ESQUERDA, HIGH);
-      digitalWrite(PIN_DIREITA, LOW);
+    String acao = doc["acao"];
+    if (acao.endsWith("_parar")) {
+        digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
+        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
+    } else {
+        if (acao == "frente") {
+            digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
+            digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
+            digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+            digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
+        } else if (acao == "tras") {
+            digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
+            digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
+            digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
+            digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
+        } else if (acao == "esquerda") {
+            digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
+            digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
+        } else if (acao == "direita") {
+            digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
+            digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
+        }
     }
-  }
-
-  if (acao == "parar") {
-    digitalWrite(PIN_FRENTE, HIGH);
-    digitalWrite(PIN_TRAS, HIGH);
-    digitalWrite(PIN_ESQUERDA, HIGH);
-    digitalWrite(PIN_DIREITA, HIGH);
-
-    if (isPressing) {
-      pressDuration = (millis() - pressStartTime) / 1000;
-      if (pressDuration > 0) {
-        Serial.print("Tempo pressionado: ");
-        Serial.print(pressDuration);
-        Serial.println(" segundos");
-      }
-      isPressing = false;
-    }
-  }
+    server.send(200, "application/json", "{\"status\":\"ok\"}");
 }
 
 void setup() {
-  Serial.begin(115200);
-  WiFi.softAP(ssid, password);
-  WiFi.softAPConfig(local_IP, gateway, subnet);
+    Serial.begin(115200);
+    WiFi.softAP(ssid, password);
+    WiFi.softAPConfig(local_IP, gateway, subnet);
 
-  Serial.println("Hotspot criado!");
-  Serial.print("IP do Hotspot: ");
-  Serial.println(WiFi.softAPIP());
+    pinMode(PIN_MOTOR_ESQUERDO_FRENTE, OUTPUT);
+    pinMode(PIN_MOTOR_ESQUERDO_TRAZ, OUTPUT);
+    pinMode(PIN_MOTOR_DIREITO_FRENTE, OUTPUT);
+    pinMode(PIN_MOTOR_DIREITO_TRAZ, OUTPUT);
 
-  pinMode(PIN_FRENTE, OUTPUT);
-  pinMode(PIN_TRAS, OUTPUT);
-  pinMode(PIN_DIREITA, OUTPUT);
-  pinMode(PIN_ESQUERDA, OUTPUT);
+    digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
+    digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+    digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
+    digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
 
-  digitalWrite(PIN_FRENTE, HIGH);
-  digitalWrite(PIN_TRAS, HIGH);
-  digitalWrite(PIN_DIREITA, HIGH);
-  digitalWrite(PIN_ESQUERDA, HIGH);
+    server.on("/", HTTP_GET, handleRoot);
+    server.on("/api/comando", HTTP_POST, handleComando);
 
-  server.on("/", HTTP_GET, handleRoot);
-  server.on("/api/comando", HTTP_POST, handleComando);
-
-  server.begin();
-  Serial.println("Servidor iniciado.");
+    server.begin();
 }
 
 void loop() {
-  server.handleClient();
+    server.handleClient();
 }
