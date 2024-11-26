@@ -55,29 +55,29 @@ const char controlPage[] PROGMEM = R"rawliteral(
     let estadoEsquerda = false;
     let estadoDireita = false;
     let estadoFrente  = false;
-    let estadotras  = false;
+    let estadoTras  = false;
     let estadoParar  = true;
 
     function atualizarAcao() {
         let acao = "";
-        if (estadoEsquerda && !estadoDireita && estadoFrente && !estadotras) {
+        if (estadoEsquerda && !estadoDireita && estadoFrente && !estadoTras) {
             acao = "esquerda_frente";
-        } else if (estadoDireita && !estadoEsquerda && estadoFrente && !estadotras) {
+        } else if (estadoDireita && !estadoEsquerda && estadoFrente && !estadoTras) {
             acao = "direita_frente";
-        } else if(!estadoDireita && !estadoEsquerda && estadoFrente && !estadotras){
+        } else if(!estadoDireita && !estadoEsquerda && estadoFrente && !estadoTras){
             acao = "frente";
         }
-        else if (estadoEsquerda && !estadoDireita && !estadoFrente && estadotras) {
+        else if (estadoEsquerda && !estadoDireita && !estadoFrente && estadoTras) {
             acao = "esquerda_tras";
-        } else if (estadoDireita && !estadoEsquerda && !estadoFrente && estadotras) {
+        } else if (estadoDireita && !estadoEsquerda && !estadoFrente && estadoTras) {
             acao = "direita_tras";
-        } else if(!estadoDireita && !estadoEsquerda && !estadoFrente && estadotras){
+        } else if(!estadoDireita && !estadoEsquerda && !estadoFrente && estadoTras){
             acao = "tras";
         }
         else if(
           (estadoDireita && estadoEsquerda)
           ||
-          (estadoFrente && estadotras)
+          (estadoFrente && estadoTras)
         ){
             acao = "";
         }
@@ -106,11 +106,11 @@ const char controlPage[] PROGMEM = R"rawliteral(
     };
 
     document.getElementById('tras').ontouchstart = () => {
-        estadotras = true;
+        estadoTras = true;
         atualizarAcao();
     };
     document.getElementById('tras').ontouchend =  () => {
-        estadotras = false;
+        estadoTras = false;
         atualizarAcao();
     };
 
