@@ -1,4 +1,4 @@
-#include <WiFi.h>
+#include <WiFi.h> 
 #include <WebServer.h>
 #include <ArduinoJson.h>
 
@@ -15,8 +15,8 @@ IPAddress subnet(255, 255, 255, 0);
 WebServer server(80);
 
 // Definição dos pinos
-#define PIN_MOTOR_ESQUERDO_FRENTE 19
-#define PIN_MOTOR_ESQUERDO_TRAZ 18
+#define PIN_MOTOR_ESQUERDO_FRENTE 18
+#define PIN_MOTOR_ESQUERDO_TRAZ 19
 #define PIN_MOTOR_DIREITO_FRENTE 22
 #define PIN_MOTOR_DIREITO_TRAZ 23
 
@@ -52,34 +52,56 @@ const char controlPage[] PROGMEM = R"rawliteral(
 </div>
 
 <script>
-    let intervalos = {};
+    let estadoEsquerda = false;
+    let estadoDireita = false;
 
-    function iniciarIntervalo(acao) {
-        if (!intervalos[acao]) {
-            enviarComando(acao);
-            intervalos[acao] = setInterval(() => enviarComando(acao), 200);
+    function atualizarAcao() {
+        let acao = "";
+        if (estadoEsquerda && estadoDireita) {
+            return; // Se ambos pressionados, nenhuma ação será enviada.
         }
+        if (estadoEsquerda) {
+            acao = "esquerda_frente";
+        } else if (estadoDireita) {
+            acao = "direita_frente";
+        } else {
+            acao = "frente";
+        }
+        enviarComando(acao);
     }
 
-    function pararIntervalo(acao) {
-        if (intervalos[acao]) {
-            clearInterval(intervalos[acao]);
-            enviarComando(acao + "_parar");
-            delete intervalos[acao];
+    document.getElementById('esquerda').ontouchstart = document.getElementById('esquerda').onmousedown = () => {
+        estadoEsquerda = true;
+        atualizarAcao();
+    };
+    document.getElementById('esquerda').ontouchend = document.getElementById('esquerda').onmouseup = document.getElementById('esquerda').onmouseleave = () => {
+        estadoEsquerda = false;
+        atualizarAcao();
+    };
+
+    document.getElementById('direita').ontouchstart = document.getElementById('direita').onmousedown = () => {
+        estadoDireita = true;
+        atualizarAcao();
+    };
+    document.getElementById('direita').ontouchend = document.getElementById('direita').onmouseup = document.getElementById('direita').onmouseleave = () => {
+        estadoDireita = false;
+        atualizarAcao();
+    };
+
+    document.getElementById('tras').ontouchstart = document.getElementById('tras').onmousedown = () => {
+        let acao = "";
+        if (estadoEsquerda) {
+            acao = "esquerda_traz";
+        } else if (estadoDireita) {
+            acao = "direita_traz";
+        } else {
+            acao = "traz";
         }
-    }
-
-    document.getElementById('frente').ontouchstart = document.getElementById('frente').onmousedown = () => iniciarIntervalo('frente');
-    document.getElementById('frente').ontouchend = document.getElementById('frente').onmouseup = document.getElementById('frente').onmouseleave = () => pararIntervalo('frente');
-
-    document.getElementById('tras').ontouchstart = document.getElementById('tras').onmousedown = () => iniciarIntervalo('tras');
-    document.getElementById('tras').ontouchend = document.getElementById('tras').onmouseup = document.getElementById('tras').onmouseleave = () => pararIntervalo('tras');
-
-    document.getElementById('esquerda').ontouchstart = document.getElementById('esquerda').onmousedown = () => iniciarIntervalo('esquerda');
-    document.getElementById('esquerda').ontouchend = document.getElementById('esquerda').onmouseup = document.getElementById('esquerda').onmouseleave = () => pararIntervalo('esquerda');
-
-    document.getElementById('direita').ontouchstart = document.getElementById('direita').onmousedown = () => iniciarIntervalo('direita');
-    document.getElementById('direita').ontouchend = document.getElementById('direita').onmouseup = document.getElementById('direita').onmouseleave = () => pararIntervalo('direita');
+        enviarComando(acao);
+    };
+    document.getElementById('tras').ontouchend = document.getElementById('tras').onmouseup = document.getElementById('tras').onmouseleave = () => {
+        enviarComando("parar");
+    };
 
     document.getElementById('parar').onclick = () => enviarComando('parar');
 
@@ -129,10 +151,10 @@ void handleComando() {
     } else if (acao == "esquerda_frente") {
         digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
     } else if (acao == "direita_frente") {
-        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
-    } else if (acao == "esquerda_tras") {
+        digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
+    } else if (acao == "esquerda_traz") {
         digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
-    } else if (acao == "direita_tras") {
+    } else if (acao == "direita_traz") {
         digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
     }
 
