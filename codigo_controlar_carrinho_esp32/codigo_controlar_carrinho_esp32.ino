@@ -60,27 +60,24 @@ const char controlPage[] PROGMEM = R"rawliteral(
 
     function atualizarAcao() {
         let acao = "";
-        if (estadoEsquerda && !estadoDireita && estadoFrente && !estadoTras) {
-            acao = "esquerda_frente";
-        } else if (estadoDireita && !estadoEsquerda && estadoFrente && !estadoTras) {
-            acao = "direita_frente";
-        } else if(!estadoDireita && !estadoEsquerda && estadoFrente && !estadoTras){
+        if(!estadoDireita && !estadoEsquerda && estadoFrente && !estadoTras){
             acao = "frente";
         }
-        else if (estadoEsquerda && !estadoDireita && !estadoFrente && estadoTras) {
-            acao = "esquerda_tras";
-        } else if (estadoDireita && !estadoEsquerda && !estadoFrente && estadoTras) {
-            acao = "direita_tras";
-        } else if(!estadoDireita && !estadoEsquerda && !estadoFrente && estadoTras){
+        else if(!estadoDireita && !estadoEsquerda && !estadoFrente && estadoTras){
             acao = "tras";
         }
-        else if(
-          (estadoDireita && estadoEsquerda)
-          ||
-          (estadoFrente && estadoTras)
-        ){
-            acao = "";
-        }
+        else if (estadoEsquerda && !estadoDireita && estadoFrente && !estadoTras) {
+            acao = "esquerda_frente";
+        } 
+        else if (estadoDireita && !estadoEsquerda && estadoFrente && !estadoTras) {
+            acao = "direita_frente";
+        } 
+        else if (estadoEsquerda && !estadoDireita && !estadoFrente && estadoTras) {
+            acao = "esquerda_tras";
+        } 
+        else if (estadoDireita && !estadoEsquerda && !estadoFrente && estadoTras) {
+            acao = "direita_tras";
+        } 
         else if(!estadoParar){
             acao = "parar";
         }
@@ -105,14 +102,16 @@ const char controlPage[] PROGMEM = R"rawliteral(
         atualizarAcao();
     };
 
+
     document.getElementById('tras').ontouchstart = () => {
         estadoTras = true;
         atualizarAcao();
     };
-    document.getElementById('tras').ontouchend =  () => {
+    document.getElementById('tras').ontouchend = () => {
         estadoTras = false;
         atualizarAcao();
     };
+
 
     document.getElementById('frente').ontouchstart = () => {
         estadoFrente = true;
@@ -172,7 +171,11 @@ void handleComando() {
     if (acao == "frente") {
         digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
         digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
+        digitalWrite(PIN_MOTOR_DIREITO_tras, HIGH);
+        digitalWrite(PIN_MOTOR_ESQUERDO_tras, HIGH);
     } else if (acao == "tras") {
+        digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
         digitalWrite(PIN_MOTOR_ESQUERDO_tras, LOW);
         digitalWrite(PIN_MOTOR_DIREITO_tras, LOW);
     } else if (acao == "esquerda_frente") {
