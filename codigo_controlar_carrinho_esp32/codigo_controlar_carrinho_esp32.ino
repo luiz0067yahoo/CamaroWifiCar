@@ -16,9 +16,9 @@ WebServer server(80);
 
 // Definição dos pinos
 #define PIN_MOTOR_ESQUERDO_FRENTE 18
-#define PIN_MOTOR_ESQUERDO_TRAZ 19
+#define PIN_MOTOR_ESQUERDO_tras 19
 #define PIN_MOTOR_DIREITO_FRENTE 22
-#define PIN_MOTOR_DIREITO_TRAZ 23
+#define PIN_MOTOR_DIREITO_tras 23
 
 // Página HTML para controle
 const char controlPage[] PROGMEM = R"rawliteral(
@@ -55,29 +55,29 @@ const char controlPage[] PROGMEM = R"rawliteral(
     let estadoEsquerda = false;
     let estadoDireita = false;
     let estadoFrente  = false;
-    let estadoTraz  = false;
+    let estadotras  = false;
     let estadoParar  = true;
 
     function atualizarAcao() {
         let acao = "";
-        if (estadoEsquerda && !estadoDireita && estadoFrente && !estadoTraz) {
+        if (estadoEsquerda && !estadoDireita && estadoFrente && !estadotras) {
             acao = "esquerda_frente";
-        } else if (estadoDireita && !estadoEsquerda && estadoFrente && !estadoTraz) {
+        } else if (estadoDireita && !estadoEsquerda && estadoFrente && !estadotras) {
             acao = "direita_frente";
-        } else if(!estadoDireita && !estadoEsquerda && estadoFrente && !estadoTraz){
+        } else if(!estadoDireita && !estadoEsquerda && estadoFrente && !estadotras){
             acao = "frente";
         }
-        else if (estadoEsquerda && !estadoDireita && !estadoFrente && estadoTraz) {
-            acao = "esquerda_traz";
-        } else if (estadoDireita && !estadoEsquerda && !estadoFrente && estadoTraz) {
-            acao = "direita_traz";
-        } else if(!estadoDireita && !estadoEsquerda && !estadoFrente && estadoTraz){
-            acao = "traz";
+        else if (estadoEsquerda && !estadoDireita && !estadoFrente && estadotras) {
+            acao = "esquerda_tras";
+        } else if (estadoDireita && !estadoEsquerda && !estadoFrente && estadotras) {
+            acao = "direita_tras";
+        } else if(!estadoDireita && !estadoEsquerda && !estadoFrente && estadotras){
+            acao = "tras";
         }
         else if(
           (estadoDireita && estadoEsquerda)
           ||
-          (estadoFrente && estadoTraz)
+          (estadoFrente && estadotras)
         ){
             acao = "";
         }
@@ -106,11 +106,11 @@ const char controlPage[] PROGMEM = R"rawliteral(
     };
 
     document.getElementById('tras').ontouchstart = () => {
-        estadoTraz = true;
+        estadotras = true;
         atualizarAcao();
     };
     document.getElementById('tras').ontouchend =  () => {
-        estadoTraz = false;
+        estadotras = false;
         atualizarAcao();
     };
 
@@ -165,41 +165,41 @@ void handleComando() {
 
     String acao = doc["acao"];
     digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
-    digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+    digitalWrite(PIN_MOTOR_ESQUERDO_tras, HIGH);
     digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
-    digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
+    digitalWrite(PIN_MOTOR_DIREITO_tras, HIGH);
 
     if (acao == "frente") {
         digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
         digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
     } else if (acao == "tras") {
-        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
-        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
+        digitalWrite(PIN_MOTOR_ESQUERDO_tras, LOW);
+        digitalWrite(PIN_MOTOR_DIREITO_tras, LOW);
     } else if (acao == "esquerda_frente") {
         digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
         digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
-        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
-        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
+        digitalWrite(PIN_MOTOR_ESQUERDO_tras, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_tras, LOW);
     } else if (acao == "direita_frente") {
         digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
         digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
-        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
-        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
-    } else if (acao == "esquerda_traz") {
+        digitalWrite(PIN_MOTOR_ESQUERDO_tras, LOW);
+        digitalWrite(PIN_MOTOR_DIREITO_tras, HIGH);
+    } else if (acao == "esquerda_tras") {
         digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
         digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
-        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
-        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
-    } else if (acao == "direita_traz") {
+        digitalWrite(PIN_MOTOR_ESQUERDO_tras, LOW);
+        digitalWrite(PIN_MOTOR_DIREITO_tras, HIGH);
+    } else if (acao == "direita_tras") {
         digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
         digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
-        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
-        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
+        digitalWrite(PIN_MOTOR_ESQUERDO_tras, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_tras, LOW);
     } else if (acao == "parar") {
       digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
-      digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+      digitalWrite(PIN_MOTOR_ESQUERDO_tras, HIGH);
       digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
-      digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
+      digitalWrite(PIN_MOTOR_DIREITO_tras, HIGH);
     }
 
     server.send(200, "application/json", "{\"status\":\"ok\"}");
@@ -211,14 +211,14 @@ void setup() {
     WiFi.softAPConfig(local_IP, gateway, subnet);
 
     pinMode(PIN_MOTOR_ESQUERDO_FRENTE, OUTPUT);
-    pinMode(PIN_MOTOR_ESQUERDO_TRAZ, OUTPUT);
+    pinMode(PIN_MOTOR_ESQUERDO_tras, OUTPUT);
     pinMode(PIN_MOTOR_DIREITO_FRENTE, OUTPUT);
-    pinMode(PIN_MOTOR_DIREITO_TRAZ, OUTPUT);
+    pinMode(PIN_MOTOR_DIREITO_tras, OUTPUT);
 
     digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
-    digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+    digitalWrite(PIN_MOTOR_ESQUERDO_tras, HIGH);
     digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
-    digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
+    digitalWrite(PIN_MOTOR_DIREITO_tras, HIGH);
 
     server.on("/", HTTP_GET, handleRoot);
     server.on("/api/comando", HTTP_POST, handleComando);
