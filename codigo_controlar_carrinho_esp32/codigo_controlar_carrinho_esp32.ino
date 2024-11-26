@@ -54,18 +54,35 @@ const char controlPage[] PROGMEM = R"rawliteral(
 <script>
     let estadoEsquerda = false;
     let estadoDireita = false;
+    let estadoFrente  = false;
+    let estadoTraz  = false;
+    let estadoParar  = true;
 
     function atualizarAcao() {
         let acao = "";
-        if (estadoEsquerda && estadoDireita) {
-            return; // Se ambos pressionados, nenhuma ação será enviada.
-        }
-        if (estadoEsquerda) {
+        if (estadoEsquerda && !estadoDireita && estadoFrente && !estadoTraz) {
             acao = "esquerda_frente";
-        } else if (estadoDireita) {
+        } else if (estadoDireita && !estadoEsquerda && estadoFrente && !estadoTraz) {
             acao = "direita_frente";
-        } else {
+        } else if(!estadoDireita && !estadoEsquerda && estadoFrente && !estadoTraz){
             acao = "frente";
+        }
+        else if (estadoEsquerda && !estadoDireita && !estadoFrente && estadoTraz) {
+            acao = "esquerda_traz";
+        } else if (estadoDireita && !estadoEsquerda && !estadoFrente && estadoTraz) {
+            acao = "direita_traz";
+        } else if(!estadoDireita && !estadoEsquerda && !estadoFrente && estadoTraz){
+            acao = "traz";
+        }
+        else if(
+          (estadoDireita && estadoEsquerda)
+          ||
+          (estadoFrente && estadoTraz)
+        ){
+            acao = "";
+        }
+        else if(!estadoParar){
+            acao = "parar";
         }
         enviarComando(acao);
     }
@@ -89,21 +106,31 @@ const char controlPage[] PROGMEM = R"rawliteral(
     };
 
     document.getElementById('tras').ontouchstart = document.getElementById('tras').onmousedown = () => {
-        let acao = "";
-        if (estadoEsquerda) {
-            acao = "esquerda_traz";
-        } else if (estadoDireita) {
-            acao = "direita_traz";
-        } else {
-            acao = "traz";
-        }
-        enviarComando(acao);
+        estadoTraz = true;
+        atualizarAcao();
     };
     document.getElementById('tras').ontouchend = document.getElementById('tras').onmouseup = document.getElementById('tras').onmouseleave = () => {
-        enviarComando("parar");
+        estadoTraz = false;
+        atualizarAcao();
     };
 
-    document.getElementById('parar').onclick = () => enviarComando('parar');
+    document.getElementById('frente').ontouchstart = document.getElementById('frente').onmousedown = () => {
+        estadoFrente = true;
+        atualizarAcao();
+    };
+    document.getElementById('frente').ontouchend = document.getElementById('frente').onmouseup = document.getElementById('frente').onmouseleave = () => {
+        estadoFrente = false;
+        atualizarAcao();
+    };
+
+    document.getElementById('parar').ontouchstart = document.getElementById('parar').onmousedown = () => {
+        estadoFrente = false;
+        atualizarAcao();
+    };
+    document.getElementById('parar').ontouchend = document.getElementById('parar').onmouseup = document.getElementById('parar').onmouseleave = () => {
+        estadoParar = true;
+        atualizarAcao();
+    };
 
     function enviarComando(acao) {
         fetch("/api/comando", {
@@ -149,13 +176,29 @@ void handleComando() {
         digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
         digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
     } else if (acao == "esquerda_frente") {
+        digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
+        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
         digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
     } else if (acao == "direita_frente") {
+        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);      
         digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
     } else if (acao == "esquerda_traz") {
+        digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
         digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
     } else if (acao == "direita_traz") {
+        digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
+        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
         digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
+    } else if (acao == "parar") {
+      digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
+      digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+      digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
+      digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
     }
 
     server.send(200, "application/json", "{\"status\":\"ok\"}");
