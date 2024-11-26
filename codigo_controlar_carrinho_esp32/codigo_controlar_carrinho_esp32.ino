@@ -87,47 +87,47 @@ const char controlPage[] PROGMEM = R"rawliteral(
         enviarComando(acao);
     }
 
-    document.getElementById('esquerda').ontouchstart = document.getElementById('esquerda').onmousedown = () => {
+    document.getElementById('esquerda').ontouchstart = () => {
         estadoEsquerda = true;
         atualizarAcao();
     };
-    document.getElementById('esquerda').ontouchend = document.getElementById('esquerda').onmouseup = document.getElementById('esquerda').onmouseleave = () => {
+    document.getElementById('esquerda').ontouchend = () => {
         estadoEsquerda = false;
         atualizarAcao();
     };
 
-    document.getElementById('direita').ontouchstart = document.getElementById('direita').onmousedown = () => {
+    document.getElementById('direita').ontouchstart = () => {
         estadoDireita = true;
         atualizarAcao();
     };
-    document.getElementById('direita').ontouchend = document.getElementById('direita').onmouseup = document.getElementById('direita').onmouseleave = () => {
+    document.getElementById('direita').ontouchend = () => {
         estadoDireita = false;
         atualizarAcao();
     };
 
-    document.getElementById('tras').ontouchstart = document.getElementById('tras').onmousedown = () => {
+    document.getElementById('tras').ontouchstart = () => {
         estadoTraz = true;
         atualizarAcao();
     };
-    document.getElementById('tras').ontouchend = document.getElementById('tras').onmouseup = document.getElementById('tras').onmouseleave = () => {
+    document.getElementById('tras').ontouchend =  () => {
         estadoTraz = false;
         atualizarAcao();
     };
 
-    document.getElementById('frente').ontouchstart = document.getElementById('frente').onmousedown = () => {
+    document.getElementById('frente').ontouchstart = () => {
         estadoFrente = true;
         atualizarAcao();
     };
-    document.getElementById('frente').ontouchend = document.getElementById('frente').onmouseup = document.getElementById('frente').onmouseleave = () => {
+    document.getElementById('frente').ontouchend = () => {
         estadoFrente = false;
         atualizarAcao();
     };
 
-    document.getElementById('parar').ontouchstart = document.getElementById('parar').onmousedown = () => {
+    document.getElementById('parar').ontouchstart = () => {
         estadoFrente = false;
         atualizarAcao();
     };
-    document.getElementById('parar').ontouchend = document.getElementById('parar').onmouseup = document.getElementById('parar').onmouseleave = () => {
+    document.getElementById('parar').ontouchend = () => {
         estadoParar = true;
         atualizarAcao();
     };
@@ -176,23 +176,24 @@ void handleComando() {
         digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
         digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
     } else if (acao == "esquerda_frente") {
-        digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
-        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
-        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
-        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
-    } else if (acao == "direita_frente") {
-        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
-        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);      
         digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
+        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
+        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
+    } else if (acao == "direita_frente") {
+        digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
+        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
+        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
     } else if (acao == "esquerda_traz") {
         digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
-        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
-        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
+        digitalWrite(PIN_MOTOR_DIREITO_FRENTE, LOW);
         digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, LOW);
+        digitalWrite(PIN_MOTOR_DIREITO_TRAZ, HIGH);
     } else if (acao == "direita_traz") {
-        digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
-        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
+        digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, LOW);
         digitalWrite(PIN_MOTOR_DIREITO_FRENTE, HIGH);
+        digitalWrite(PIN_MOTOR_ESQUERDO_TRAZ, HIGH);
         digitalWrite(PIN_MOTOR_DIREITO_TRAZ, LOW);
     } else if (acao == "parar") {
       digitalWrite(PIN_MOTOR_ESQUERDO_FRENTE, HIGH);
