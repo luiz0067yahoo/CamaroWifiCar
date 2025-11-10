@@ -56,7 +56,7 @@ const char html[] PROGMEM = R"rawliteral(
         <button id='direita_frente' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>↗</button>
         
         <button id='esquerda' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>◀</button>
-        <button id='parar' style='font-size:80px;height:60px;background:#ff0000;color:white;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>⬛</button>
+        <button id='parar' style='font-size:36px;height:60px;background:#ff0000;color:white;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>⬛</button>
         <button id='direita' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>▶</button>
         
         <button id='esquerda_tras' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>↙</button>
@@ -64,13 +64,12 @@ const char html[] PROGMEM = R"rawliteral(
         <button id='direita_tras' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>↘</button>
     </div>
 
-    <h1 style='font-size:80px;margin:20px 0 10px;text-shadow:0 0 10px #00ff00;'>FAROL</h1>
-    <div style='margin:30px auto;'>
-        <label style='position:relative;display:inline-block;width:80%;height:180px;cursor:pointer;'>
+    <h1 style='font-size:30px;margin:10px 0 10px;text-shadow:0 0 10px #00ff00;'>FAROL</h1>
+    <div style='margin:10px auto;'>
+        <label style='position:relative;display:inline-block;width:200px;height:60px;cursor:pointer;'>
             <input type='checkbox' id='luz_interruptor' checked style='opacity:0;width:0;height:0;'>
             <span id='slider' style='position:absolute;top:0;left:0;right:0;bottom:0;background:#00ff00;transition:.4s;border-radius:90px;box-shadow:inset 0 0 20px rgba(0,0,0,0.5);'></span>
-            <span id='bola' style='position:absolute;content:'';height:30px;width:30px;left:15px;bottom:15px;background:white;transition:.4s;border-radius:50%;box-shadow:0 6px 20px rgba(0,0,0,0.4);transform:translateX(420px);'></span>
-            <span id='texto' style='color:white;font-weight:bold;font-size:48px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-shadow:2px 2px 10px black;width:100%;'></span>
+            <span id='bola' style='position:absolute;height:30px;width:30px;left:15px;bottom:15px;background:white;transition:.4s;border-radius:50%;box-shadow:0 6px 20px rgba(0,0,0,0.4);transform:translateX(140px);'></span>
         </label>
     </div>
 
