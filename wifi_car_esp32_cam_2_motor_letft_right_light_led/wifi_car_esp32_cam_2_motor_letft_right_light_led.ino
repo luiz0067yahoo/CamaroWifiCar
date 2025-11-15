@@ -51,25 +51,25 @@ const char html[] PROGMEM = R"rawliteral(
     <img id='camera' src='/cam' alt='Câmera' style='width:100%;max-width:640px;min-height:200px;border:4px solid #00ff00;border-radius:15px;margin:15px auto;display:block;box-shadow:0 0 20px rgba(0,255,0,0.6);'>
     
     <div style='display:grid;grid-template-columns:repeat(3,1fr);gap:15px;max-width:780px;margin:20px auto;padding:10px;'>
-        <button id='esquerda_frente' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>↖</button>
-        <button id='frente' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>▲</button>
-        <button id='direita_frente' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>↗</button>
+        <button id='esquerda_frente' style='font-size:36px;height:50px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>↖</button>
+        <button id='frente' style='font-size:36px;height:50px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>▲</button>
+        <button id='direita_frente' style='font-size:36px;height:50px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>↗</button>
         
-        <button id='esquerda' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>◀</button>
-        <button id='parar' style='font-size:36px;height:60px;background:#ff0000;color:white;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>⬛</button>
-        <button id='direita' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>▶</button>
+        <button  style='font-size:36px;height:50px;background:transparent;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>&nbsp;</button>
+        <button id='parar' style='font-size:36px;height:50px;background:#ff0000;color:white;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>⬛</button>
+        <button  style='font-size:36px;height:50px;background:transparent;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>&nbsp;</button>
         
-        <button id='esquerda_tras' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>↙</button>
-        <button id='tras' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>▼</button>
-        <button id='direita_tras' style='font-size:48px;height:60px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>↘</button>
+        <button id='esquerda_tras' style='font-size:36px;height:50px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>↙</button>
+        <button id='tras' style='font-size:36px;height:50px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>▼</button>
+        <button id='direita_tras' style='font-size:36px;height:50px;background:#00ff00;color:#000;border:none;border-radius:20px;box-shadow:0 8px 15px rgba(0,0,0,0.4);transition:all 0.2s;'>↘</button>
     </div>
 
     <h1 style='font-size:30px;margin:10px 0 10px;text-shadow:0 0 10px #00ff00;'>FAROL</h1>
     <div style='margin:10px auto;'>
-        <label style='position:relative;display:inline-block;width:200px;height:60px;cursor:pointer;'>
+        <label style='position:relative;display:inline-block;width:200px;height:50px;cursor:pointer;'>
             <input type='checkbox' id='luz_interruptor' checked style='opacity:0;width:0;height:0;'>
             <span id='slider' style='position:absolute;top:0;left:0;right:0;bottom:0;background:#00ff00;transition:.4s;border-radius:90px;box-shadow:inset 0 0 20px rgba(0,0,0,0.5);'></span>
-            <span id='bola' style='position:absolute;height:30px;width:30px;left:15px;bottom:15px;background:white;transition:.4s;border-radius:50%;box-shadow:0 6px 20px rgba(0,0,0,0.4);transform:translateX(140px);'></span>
+            <span id='bola' style='position:absolute;height:30px;width:30px;left:15px;bottom:10px;background:white;transition:.4s;border-radius:50%;box-shadow:0 6px 20px rgba(0,0,0,0.4);transform:translateX(140px);'></span>
         </label>
     </div>
 
@@ -80,8 +80,6 @@ const char html[] PROGMEM = R"rawliteral(
     const comandos = {
         frente: () => { frente = true; tras = esquerda = direita = false; },
         tras: () => { tras = true; frente = esquerda = direita = false; },
-        esquerda: () => { esquerda = true; direita = frente = tras = false; },
-        direita: () => { direita = true; esquerda = frente = tras = false; },
         esquerda_frente: () => { frente = esquerda = true; tras = direita = false; },
         direita_frente: () => { frente = direita = true; tras = esquerda = false; },
         esquerda_tras: () => { tras = esquerda = true; frente = direita = false; },
@@ -134,7 +132,7 @@ const char html[] PROGMEM = R"rawliteral(
         luz = this.checked;
         if (this.checked) {
             slider.style.background = '#00ff00';
-            bola.style.transform = 'translateX(420px)';
+            bola.style.transform = 'translateX(140px)';
         } else {
             slider.style.background = '#ccc';
             bola.style.transform = 'translateX(0)';
@@ -224,28 +222,29 @@ void esquerdoFrente() {
   digitalWrite(motor_esquerdo_frente, LOW);
   digitalWrite(motor_esquerdo_traz, LOW);
   digitalWrite(motor_direito_frente, HIGH);
+  digitalWrite(motor_direito_traz, HIGH);
+}
+
+
+void direitoFrente() {
+  digitalWrite(motor_esquerdo_frente, HIGH);
+  digitalWrite(motor_esquerdo_traz, HIGH);
+  digitalWrite(motor_direito_frente, LOW);
   digitalWrite(motor_direito_traz, LOW);
 }
 
 void esquerdoTras() {
-  digitalWrite(motor_esquerdo_frente, LOW);
-  digitalWrite(motor_esquerdo_traz, LOW);
-  digitalWrite(motor_direito_frente, LOW);
-  digitalWrite(motor_direito_traz, HIGH);
-}
-
-void direitoFrente() {
   digitalWrite(motor_esquerdo_frente, HIGH);
-  digitalWrite(motor_esquerdo_traz, LOW);
+  digitalWrite(motor_esquerdo_traz, HIGH);
   digitalWrite(motor_direito_frente, LOW);
   digitalWrite(motor_direito_traz, LOW);
 }
 
 void direitoTras() {
   digitalWrite(motor_esquerdo_frente, LOW);
-  digitalWrite(motor_esquerdo_traz, HIGH);
-  digitalWrite(motor_direito_frente, LOW);
-  digitalWrite(motor_direito_traz, LOW);
+  digitalWrite(motor_esquerdo_traz, LOW);
+  digitalWrite(motor_direito_frente, HIGH);
+  digitalWrite(motor_direito_traz, HIGH);
 }
 
 // ==================== API COM LUZ ======================
